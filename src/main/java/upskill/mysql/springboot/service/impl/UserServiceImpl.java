@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import upskill.mysql.springboot.dto.UserDto;
 import upskill.mysql.springboot.entity.User;
+import upskill.mysql.springboot.exceptions.EmailAlreadyExistsException;
 import upskill.mysql.springboot.exceptions.ResourceNotFoundException;
 import upskill.mysql.springboot.mapper.AutoUserMapper;
 import upskill.mysql.springboot.mapper.UserMapper;
@@ -34,6 +35,11 @@ public class UserServiceImpl implements UserService {
 
         //User user = modelMapper.map(userDto,User.class);
 
+        Optional<User> optionalUser = userRepository.findByEmail(userDto.getEmail());
+
+        if (optionalUser.isPresent()){
+            throw new EmailAlreadyExistsException("Email Already Exists");
+        }
         User user = AutoUserMapper.MAPPER.mapToUser(userDto);
 
         User savedUser = userRepository.save(user);
